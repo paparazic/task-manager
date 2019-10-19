@@ -50,14 +50,17 @@ router.patch('/tasks/:id', async (req, res) => {
 
         if (!isValidKeys) {
             return req.status(400).send({
-                 error: "Invalid parameters, you tried to update wrong keys" 
-                })
+                error: "Invalid parameters, you tried to update wrong keys"
+            })
         }
-        const task = await Task.findByIdAndUpdate(_id, req.body, { new: true, runValidators: true })
+        const task = await Task.findById(_id);
+        updates.forEach((update) => task[update] = req.body[update])
+        await task.save()
+        // const task = await Task.findByIdAndUpdate(_id, req.body, { new: true, runValidators: true })
         if (!task) {
             return res.status(404).send({
-                 error: "task with id " + _id + " not exist" 
-                })
+                error: "task with id " + _id + " not exist"
+            })
         }
         res.send(task)
     } catch (e) {
